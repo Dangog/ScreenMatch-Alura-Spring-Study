@@ -14,8 +14,8 @@ public class ScreenMatchApplication implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) throws Exception {
-		Principal principal = new Principal();
 
+		Principal principal = new Principal();
 		principal.showMenu();
 
 	}

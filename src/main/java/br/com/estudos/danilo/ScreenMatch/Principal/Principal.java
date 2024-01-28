@@ -1,14 +1,17 @@
 package br.com.estudos.danilo.ScreenMatch.Principal;
 
 import br.com.estudos.danilo.ScreenMatch.model.DadosSerie;
+import br.com.estudos.danilo.ScreenMatch.model.EpisodeData;
 import br.com.estudos.danilo.ScreenMatch.model.SeasonData;
 import br.com.estudos.danilo.ScreenMatch.service.ConsumoAPI;
 import br.com.estudos.danilo.ScreenMatch.service.JacksonDataConverter;
 
 import java.sql.SQLOutput;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Scanner;
+import java.util.stream.Collectors;
 
 public class Principal {
 
@@ -35,7 +38,27 @@ public class Principal {
 			SeasonData convertedSeasonData = conv.getData(json, SeasonData.class);
 			seasonsList.add(convertedSeasonData);
 		}
-		seasonsList.forEach(System.out::println);
+
+        List<EpisodeData> allEpisodesData =  seasonsList.stream()
+                        .flatMap(s -> s.episodes().stream())
+                .collect(Collectors.toList());
+
+        allEpisodesData.stream()
+                .filter(e -> !e.avaliation().equalsIgnoreCase("N/A"))
+                        .sorted(Comparator.comparing(EpisodeData::avaliation).reversed())
+                                .limit(5)
+                                        .forEach(System.out::println);
+
+//        for (int i = 0; i<convertedData.totalTemporadas(); i++){
+//            List<EpisodeData> seasonEpisodes = seasonsList.get(i).episodes();
+//            for (int j = 0; j < seasonEpisodes.size(); j++){
+//                System.out.println(seasonEpisodes.get(j).title());
+//            }
+//        }
+
+//        seasonsList.forEach(s -> s.episodes().forEach(e -> System.out.println(e.title())));
+//		seasonsList.forEach(System.out::println);
+
 
 
     }
