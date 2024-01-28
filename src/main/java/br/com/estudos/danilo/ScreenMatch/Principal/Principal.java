@@ -1,6 +1,7 @@
 package br.com.estudos.danilo.ScreenMatch.Principal;
 
 import br.com.estudos.danilo.ScreenMatch.model.DadosSerie;
+import br.com.estudos.danilo.ScreenMatch.model.Episode;
 import br.com.estudos.danilo.ScreenMatch.model.EpisodeData;
 import br.com.estudos.danilo.ScreenMatch.model.SeasonData;
 import br.com.estudos.danilo.ScreenMatch.service.ConsumoAPI;
@@ -49,17 +50,12 @@ public class Principal {
                                 .limit(5)
                                         .forEach(System.out::println);
 
-//        for (int i = 0; i<convertedData.totalTemporadas(); i++){
-//            List<EpisodeData> seasonEpisodes = seasonsList.get(i).episodes();
-//            for (int j = 0; j < seasonEpisodes.size(); j++){
-//                System.out.println(seasonEpisodes.get(j).title());
-//            }
-//        }
+        List<Episode> episodes =  seasonsList.stream()
+                .flatMap(s -> s.episodes().stream()
+                    .map(d -> new Episode(d.episodeNumber(), d))
+                ).collect(Collectors.toList());
 
-//        seasonsList.forEach(s -> s.episodes().forEach(e -> System.out.println(e.title())));
-//		seasonsList.forEach(System.out::println);
-
-
+        episodes.forEach(System.out::println);
 
     }
 }
