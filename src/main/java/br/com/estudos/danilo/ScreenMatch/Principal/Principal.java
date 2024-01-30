@@ -8,10 +8,9 @@ import br.com.estudos.danilo.ScreenMatch.service.ConsumoAPI;
 import br.com.estudos.danilo.ScreenMatch.service.JacksonDataConverter;
 
 import java.sql.SQLOutput;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Scanner;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class Principal {
@@ -24,7 +23,7 @@ public class Principal {
     private JacksonDataConverter conv = new JacksonDataConverter();
 
     public void showMenu(){
-        System.out.println("Digite a respectiva série para que faça a busca");
+        System.out.println("\nDigite a respectiva série para que faça a busca: ");
         var resp = t.nextLine();
 
         var json = principalConsume.obterDados(URL + resp.replace(" ", "+") + APIKey);
@@ -44,11 +43,16 @@ public class Principal {
                         .flatMap(s -> s.episodes().stream())
                 .collect(Collectors.toList());
 
-        allEpisodesData.stream()
-                .filter(e -> !e.avaliation().equalsIgnoreCase("N/A"))
-                        .sorted(Comparator.comparing(EpisodeData::avaliation).reversed())
-                                .limit(5)
-                                        .forEach(System.out::println);
+//        allEpisodesData.stream()
+//                .filter(e -> !e.avaliation().equalsIgnoreCase("N/A"))
+//                .peek(e -> System.out.println("Primeiro filtro " + e))
+//                .sorted(Comparator.comparing(EpisodeData::avaliation).reversed())
+//                .peek(e -> System.out.println("Ordenação " + e))
+//                .limit(5)
+//                .peek(e -> System.out.println("Processo de limitação " + e))
+//                .map(e -> e.title().toUpperCase())
+//                .peek(e -> System.out.println("Deixando em maiúsculo com  mapeamento " + e))
+//                .forEach(System.out::println);
 
         List<Episode> episodes =  seasonsList.stream()
                 .flatMap(s -> s.episodes().stream()
@@ -56,6 +60,41 @@ public class Principal {
                 ).collect(Collectors.toList());
 
         episodes.forEach(System.out::println);
+
+
+
+
+        System.out.println("Digite o usuário que deseja ser buscado: ");
+        var episodeSearch = t.nextLine();
+
+        Optional<Episode> searchedEpisode = episodes.stream()
+                .filter(e -> e.getTitle().contains(episodeSearch))
+                .peek(e -> System.out.println("O episódio com base no titulo é: " + e))
+                .findFirst();
+
+        if (searchedEpisode.isPresent()){
+            System.out.println("Episódio encontrado");
+            System.out.println("Temporada: " + searchedEpisode.get().getSeason());
+        } else {
+            System.out.println("O episódio " + searchedEpisode + " não foi encontrado");
+        }
+
+
+
+//        System.out.println("A partir de que ano você deseja ver o episódio?: ");
+//        var year = t.nextInt();
+//        t.nextLine();
+//
+//        LocalDate searchDate = LocalDate.of(year, 1 ,1);
+//
+//        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+//
+//        episodes.stream()
+//                .filter(e -> e.getReleasedDate() !=  null && e.getReleasedDate().isAfter(searchDate))
+//                .forEach(e -> System.out.println("Temporada: " + e.getSeason()
+//                + " Episódio: " + e.getEpisodeNumber()
+//                + " Data de Lançamento: " + formatter.format(e.getReleasedDate())));
+
 
     }
 }
