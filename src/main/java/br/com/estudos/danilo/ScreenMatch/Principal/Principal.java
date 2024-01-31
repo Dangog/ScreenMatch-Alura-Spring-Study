@@ -56,29 +56,40 @@ public class Principal {
 
         List<Episode> episodes =  seasonsList.stream()
                 .flatMap(s -> s.episodes().stream()
-                    .map(d -> new Episode(d.episodeNumber(), d))
+                    .map(d -> new Episode(s.respectiveSeason(), d))
                 ).collect(Collectors.toList());
 
         episodes.forEach(System.out::println);
 
+        Map<Integer, Double> perSeasonRating = episodes.stream()
+                .filter(sR -> sR.getAvaliation() > 0.0)
+                .collect(Collectors.groupingBy(Episode::getSeason,
+                        Collectors.averagingDouble(Episode::getAvaliation)));
 
+        System.out.println(perSeasonRating);
 
+        DoubleSummaryStatistics dse = episodes.stream()
+                .filter(e -> e.getAvaliation() > 0.0)
+                .collect(Collectors.summarizingDouble(Episode::getAvaliation));
+        System.out.println("Média: " + dse.getAverage());
+        System.out.println("Episódio mais bem avaliado: " + dse.getMax());
+        System.out.println("Episódio mais mal avaliado: " + dse.getMin());
+        System.out.println("Contagem de episódios: " + dse.getCount());
 
-        System.out.println("Digite o usuário que deseja ser buscado: ");
-        var episodeSearch = t.nextLine();
-
-        Optional<Episode> searchedEpisode = episodes.stream()
-                .filter(e -> e.getTitle().contains(episodeSearch))
-                .peek(e -> System.out.println("O episódio com base no titulo é: " + e))
-                .findFirst();
-
-        if (searchedEpisode.isPresent()){
-            System.out.println("Episódio encontrado");
-            System.out.println("Temporada: " + searchedEpisode.get().getSeason());
-        } else {
-            System.out.println("O episódio " + searchedEpisode + " não foi encontrado");
-        }
-
+//        System.out.println("Digite o usuário que deseja ser buscado: ");
+//        var episodeSearch = t.nextLine();
+//
+//        Optional<Episode> searchedEpisode = episodes.stream()
+//                .filter(e -> e.getTitle().contains(episodeSearch))
+//                .peek(e -> System.out.println("O episódio com base no titulo é: " + e))
+//                .findFirst();
+//
+//        if (searchedEpisode.isPresent()){
+//            System.out.println("Episódio encontrado");
+//            System.out.println("Temporada: " + searchedEpisode.get().getSeason());
+//        } else {
+//            System.out.println("O episódio " + searchedEpisode + " não foi encontrado");
+//        }
 
 
 //        System.out.println("A partir de que ano você deseja ver o episódio?: ");
