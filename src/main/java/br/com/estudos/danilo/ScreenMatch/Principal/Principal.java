@@ -16,96 +16,108 @@ import java.util.stream.Collectors;
 public class Principal {
 
     Scanner t = new Scanner(System.in);
-
+    Scanner s = new Scanner(System.in);
     private final String URL = "https://www.omdbapi.com/?t=";
     private final String APIKey = "&apikey=1d559d70";
     private ConsumoAPI principalConsume = new ConsumoAPI();
     private JacksonDataConverter conv = new JacksonDataConverter();
 
-    public void showMenu(){
-        System.out.println("\nDigite a respectiva série para que faça a busca: ");
-        var resp = t.nextLine();
+    private List<DadosSerie> seriesData = new ArrayList<>();
 
-        var json = principalConsume.obterDados(URL + resp.replace(" ", "+") + APIKey);
+    public void showMenu() {
+       var resp = -1;
 
-        DadosSerie convertedData = conv.getData(json, br.com.estudos.danilo.ScreenMatch.model.DadosSerie.class);
-        System.out.println(convertedData);
+        while (resp != 0) {
 
-        List<SeasonData> seasonsList = new ArrayList<>();
+            var menu = """
+                    1 - Buscar séries
+                    2 - Buscar episódios
+                    3 - Listar séries buscadas
+                                    
+                    0 - Sair                                 
+                    """;
+            System.out.println(menu);
 
-		for (int i = 1; i<=convertedData.totalTemporadas(); i++){
-			json = principalConsume.obterDados(URL + resp.replace(" ", "+")+ "&season=" + i + APIKey);
-			SeasonData convertedSeasonData = conv.getData(json, SeasonData.class);
-			seasonsList.add(convertedSeasonData);
-		}
+            resp = t.nextInt();
 
-        List<EpisodeData> allEpisodesData =  seasonsList.stream()
-                        .flatMap(s -> s.episodes().stream())
-                .collect(Collectors.toList());
+            switch (resp) {
+                case 1 -> searchSerieByWeb();
+                case 2 -> searchEpisodeBySerie();
+                case 3 -> listSearchSeries();
+                case 0 -> System.out.println("Saindo...");
+                default -> System.out.println("Opção inválida");
+            }
+        }
+    }
 
-//        allEpisodesData.stream()
-//                .filter(e -> !e.avaliation().equalsIgnoreCase("N/A"))
-//                .peek(e -> System.out.println("Primeiro filtro " + e))
-//                .sorted(Comparator.comparing(EpisodeData::avaliation).reversed())
-//                .peek(e -> System.out.println("Ordenação " + e))
-//                .limit(5)
-//                .peek(e -> System.out.println("Processo de limitação " + e))
-//                .map(e -> e.title().toUpperCase())
-//                .peek(e -> System.out.println("Deixando em maiúsculo com  mapeamento " + e))
-//                .forEach(System.out::println);
+    private void searchSerieByWeb() {
+        DadosSerie data = getSerieData();
+        seriesData.add(data);
+        System.out.println(data);
+    }
 
-        List<Episode> episodes =  seasonsList.stream()
-                .flatMap(s -> s.episodes().stream()
-                    .map(d -> new Episode(s.respectiveSeason(), d))
-                ).collect(Collectors.toList());
+    private DadosSerie getSerieData() {
+        System.out.println("Digite o nome da série para busca");
+        var serieName = s.nextLine();
+        var json = principalConsume.obterDados(URL + serieName.replace(" ", "+") + APIKey);
+        DadosSerie data = conv.getData(json, DadosSerie.class);
+        return data;
+    }
 
-        episodes.forEach(System.out::println);
+    private void searchEpisodeBySerie(){
+        DadosSerie serieData = getSerieData();
+        List<SeasonData> seasons = new ArrayList<>();
 
-        Map<Integer, Double> perSeasonRating = episodes.stream()
-                .filter(sR -> sR.getAvaliation() > 0.0)
-                .collect(Collectors.groupingBy(Episode::getSeason,
-                        Collectors.averagingDouble(Episode::getAvaliation)));
+        for (int i = 1; i <= serieData.totalTemporadas(); i++) {
+            var json = principalConsume.obterDados(URL + serieData.titulo().replace(" ", "+") + "&season=" + i + APIKey);
+            SeasonData seasonData = conv.getData(json, SeasonData.class);
+            seasons.add(seasonData);
+        }
+        seasons.forEach(System.out::println);
+    }
 
-        System.out.println(perSeasonRating);
-
-        DoubleSummaryStatistics dse = episodes.stream()
-                .filter(e -> e.getAvaliation() > 0.0)
-                .collect(Collectors.summarizingDouble(Episode::getAvaliation));
-        System.out.println("Média: " + dse.getAverage());
-        System.out.println("Episódio mais bem avaliado: " + dse.getMax());
-        System.out.println("Episódio mais mal avaliado: " + dse.getMin());
-        System.out.println("Contagem de episódios: " + dse.getCount());
-
-//        System.out.println("Digite o usuário que deseja ser buscado: ");
-//        var episodeSearch = t.nextLine();
-//
-//        Optional<Episode> searchedEpisode = episodes.stream()
-//                .filter(e -> e.getTitle().contains(episodeSearch))
-//                .peek(e -> System.out.println("O episódio com base no titulo é: " + e))
-//                .findFirst();
-//
-//        if (searchedEpisode.isPresent()){
-//            System.out.println("Episódio encontrado");
-//            System.out.println("Temporada: " + searchedEpisode.get().getSeason());
-//        } else {
-//            System.out.println("O episódio " + searchedEpisode + " não foi encontrado");
-//        }
-
-
-//        System.out.println("A partir de que ano você deseja ver o episódio?: ");
-//        var year = t.nextInt();
-//        t.nextLine();
-//
-//        LocalDate searchDate = LocalDate.of(year, 1 ,1);
-//
-//        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-//
-//        episodes.stream()
-//                .filter(e -> e.getReleasedDate() !=  null && e.getReleasedDate().isAfter(searchDate))
-//                .forEach(e -> System.out.println("Temporada: " + e.getSeason()
-//                + " Episódio: " + e.getEpisodeNumber()
-//                + " Data de Lançamento: " + formatter.format(e.getReleasedDate())));
-
-
+    private void listSearchSeries(){
+        seriesData.forEach(System.out::println);
     }
 }
+
+
+//        var json = principalConsume.obterDados(URL + resp.replace(" ", "+") + APIKey);
+//
+//        DadosSerie convertedData = conv.getData(json, br.com.estudos.danilo.ScreenMatch.model.DadosSerie.class);
+//        System.out.println(convertedData);
+//
+//        List<SeasonData> seasonsList = new ArrayList<>();
+//
+//		for (int i = 1; i<=convertedData.totalTemporadas(); i++){
+//			json = principalConsume.obterDados(URL + resp.replace(" ", "+")+ "&season=" + i + APIKey);
+//			SeasonData convertedSeasonData = conv.getData(json, SeasonData.class);
+//			seasonsList.add(convertedSeasonData);
+//		}
+//
+//        List<EpisodeData> allEpisodesData =  seasonsList.stream()
+//                        .flatMap(s -> s.episodes().stream())
+//                .collect(Collectors.toList());
+//
+//
+//        List<Episode> episodes =  seasonsList.stream()
+//                .flatMap(s -> s.episodes().stream()
+//                    .map(d -> new Episode(s.respectiveSeason(), d))
+//                ).collect(Collectors.toList());
+//
+//        episodes.forEach(System.out::println);
+//
+//        Map<Integer, Double> perSeasonRating = episodes.stream()
+//                .filter(sR -> sR.getAvaliation() > 0.0)
+//                .collect(Collectors.groupingBy(Episode::getSeason,
+//                        Collectors.averagingDouble(Episode::getAvaliation)));
+//
+//        System.out.println(perSeasonRating);
+//
+//        DoubleSummaryStatistics dse = episodes.stream()
+//                .filter(e -> e.getAvaliation() > 0.0)
+//                .collect(Collectors.summarizingDouble(Episode::getAvaliation));
+//        System.out.println("Média: " + dse.getAverage());
+//        System.out.println("Episódio mais bem avaliado: " + dse.getMax());
+//        System.out.println("Episódio mais mal avaliado: " + dse.getMin());
+//        System.out.println("Contagem de episódios: " + dse.getCount());
