@@ -1,6 +1,5 @@
 package br.com.estudos.danilo.ScreenMatch.model;
 
-import br.com.estudos.danilo.ScreenMatch.service.GPTConsume;
 import com.fasterxml.jackson.annotation.JsonAlias;
 
 import java.util.OptionalDouble;
@@ -22,7 +21,7 @@ public class Serie {
         this.genero = Category.fromPortugues(dadosSerie.genero().split(",")[0].trim());
         this.atores = dadosSerie.atores();
         this.poster = dadosSerie.poster();
-        this.sinopse = GPTConsume.getTranslation(dadosSerie.sinopse().trim());
+        this.sinopse = dadosSerie.sinopse();
     }
 
     @Override
