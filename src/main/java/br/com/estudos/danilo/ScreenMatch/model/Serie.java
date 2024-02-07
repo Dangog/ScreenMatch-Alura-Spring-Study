@@ -1,17 +1,38 @@
 package br.com.estudos.danilo.ScreenMatch.model;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
+import jakarta.persistence.*;
 
 import java.util.OptionalDouble;
 
+@Entity
+@Table(name = "series")
 public class Serie {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    private Long id;
+
+    @Column(name = "title", unique = true)
     private String titulo;
+
+    @Column(name = "totalSeasons")
     private Integer totalTemporadas;
+
+    @Column(name = "rating")
     private Double avaliacao;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "genre")
     private Category genero;
+
+    @Column(name = "actors")
     private String atores;
+
+    @Column(name = "posterURL")
     private String poster;
+
+    @Column(name = "plot")
     private String sinopse;
 
     public Serie(DadosSerie dadosSerie) {
@@ -33,6 +54,15 @@ public class Serie {
                 ", atores='" + atores + '\'' +
                 ", poster='" + poster + '\'' +
                 ", sinopse='" + sinopse + '\'';
+    }
+
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getTitulo() {
