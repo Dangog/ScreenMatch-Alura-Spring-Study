@@ -1,6 +1,7 @@
 package br.com.estudos.danilo.ScreenMatch.Principal;
 
 import br.com.estudos.danilo.ScreenMatch.model.DadosSerie;
+import br.com.estudos.danilo.ScreenMatch.model.Serie;
 import br.com.estudos.danilo.ScreenMatch.model.Episode;
 import br.com.estudos.danilo.ScreenMatch.model.EpisodeData;
 import br.com.estudos.danilo.ScreenMatch.model.SeasonData;
@@ -77,7 +78,13 @@ public class Principal {
     }
 
     private void listSearchSeries(){
-        seriesData.forEach(System.out::println);
+        List <Serie> series = new ArrayList<>();
+        series = seriesData.stream()
+                        .map(d -> new Serie(d))
+                                .collect(Collectors.toList());
+        series.stream()
+                .sorted(Comparator.comparing(Serie::getGenero))
+                .forEach(System.out::println);
     }
 }
 
