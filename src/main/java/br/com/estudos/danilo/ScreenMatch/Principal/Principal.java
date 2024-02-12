@@ -5,8 +5,10 @@ import br.com.estudos.danilo.ScreenMatch.model.Serie;
 import br.com.estudos.danilo.ScreenMatch.model.Episode;
 import br.com.estudos.danilo.ScreenMatch.model.EpisodeData;
 import br.com.estudos.danilo.ScreenMatch.model.SeasonData;
+import br.com.estudos.danilo.ScreenMatch.repository.SerieRepository;
 import br.com.estudos.danilo.ScreenMatch.service.ConsumoAPI;
 import br.com.estudos.danilo.ScreenMatch.service.JacksonDataConverter;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.sql.SQLOutput;
 import java.time.LocalDate;
@@ -16,6 +18,8 @@ import java.util.stream.Collectors;
 
 public class Principal {
 
+    private SerieRepository serieRepository;
+
     Scanner t = new Scanner(System.in);
     Scanner s = new Scanner(System.in);
     private final String URL = "https://www.omdbapi.com/?t=";
@@ -24,6 +28,10 @@ public class Principal {
     private JacksonDataConverter conv = new JacksonDataConverter();
 
     private List<DadosSerie> seriesData = new ArrayList<>();
+
+    public Principal(SerieRepository serieRepository) {
+        this.serieRepository = serieRepository;
+    }
 
     public void showMenu() {
        var resp = -1;
@@ -53,7 +61,9 @@ public class Principal {
 
     private void searchSerieByWeb() {
         DadosSerie data = getSerieData();
-        seriesData.add(data);
+        //seriesData.add(data);
+        Serie serie = new Serie(data);
+        serieRepository.save(serie);
         System.out.println(data);
     }
 
@@ -78,12 +88,9 @@ public class Principal {
     }
 
     private void listSearchSeries(){
-        List <Serie> series = new ArrayList<>();
-        series = seriesData.stream()
-                        .map(d -> new Serie(d))
-                                .collect(Collectors.toList());
+        List <Serie> series = series = serieRepository.findAll();
         series.stream()
-                .sorted(Comparator.comparing(Serie::getGenero))
+                .sorted(Comparator.comparing(Serie::getGenre))
                 .forEach(System.out::println);
     }
 }

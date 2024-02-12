@@ -2,7 +2,7 @@ package br.com.estudos.danilo.ScreenMatch.model;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
 import jakarta.persistence.*;
-
+import java.util.*;
 import java.util.OptionalDouble;
 
 @Entity
@@ -14,48 +14,53 @@ public class Serie {
     private Long id;
 
     @Column(name = "title", unique = true)
-    private String titulo;
+    private String title;
 
     @Column(name = "totalSeasons")
-    private Integer totalTemporadas;
+    private Integer totalSeasons;
 
     @Column(name = "rating")
-    private Double avaliacao;
+    private Double rating;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "genre")
-    private Category genero;
+    private Category genre;
 
     @Column(name = "actors")
-    private String atores;
+    private String actors;
 
     @Column(name = "posterURL")
-    private String poster;
+    private String posterURL;
 
     @Column(name = "plot")
-    private String sinopse;
+    private String plot;
+
+    @Transient
+    private List<Episode> episodes = new ArrayList<>();
+
+    public Serie(){};
 
     public Serie(DadosSerie dadosSerie) {
-        this.titulo = dadosSerie.titulo();
-        this.totalTemporadas = dadosSerie.totalTemporadas();
-        this.avaliacao = OptionalDouble.of(Double.valueOf(dadosSerie.avaliacao())).orElse(0.0);
-        this.genero = Category.fromPortugues(dadosSerie.genero().split(",")[0].trim());
-        this.atores = dadosSerie.atores();
-        this.poster = dadosSerie.poster();
-        this.sinopse = dadosSerie.sinopse();
+        this.title = dadosSerie.titulo();
+        this.totalSeasons = dadosSerie.totalTemporadas();
+        this.rating = OptionalDouble.of(Double.valueOf(dadosSerie.avaliacao())).orElse(0.0);
+        this.genre = Category.fromPortugues(dadosSerie.genero().split(",")[0].trim());
+        this.actors = dadosSerie.atores();
+        this.posterURL = dadosSerie.poster();
+        this.plot = dadosSerie.sinopse();
     }
 
     @Override
     public String toString() {
-        return  "genero=" + genero +
-                ", titulo='" + titulo + '\'' +
-                ", totalTemporadas=" + totalTemporadas +
-                ", avaliacao=" + avaliacao +
-                ", atores='" + atores + '\'' +
-                ", poster='" + poster + '\'' +
-                ", sinopse='" + sinopse + '\'';
+        return  "id=" + id +
+                ", title='" + title + '\'' +
+                ", totalSeasons=" + totalSeasons +
+                ", rating=" + rating +
+                ", genre=" + genre +
+                ", actors='" + actors + '\'' +
+                ", posterURL='" + posterURL + '\'' +
+                ", plot='" + plot;
     }
-
 
     public Long getId() {
         return id;
@@ -65,62 +70,59 @@ public class Serie {
         this.id = id;
     }
 
-    public String getTitulo() {
-        return titulo;
+    public String getTitle() {
+        return title;
     }
 
-    public void setTitulo(String titulo) {
-        this.titulo = titulo;
+    public void setTitle(String title) {
+        this.title = title;
     }
 
-    public Integer getTotalTemporadas() {
-        return totalTemporadas;
+    public Integer getTotalSeasons() {
+        return totalSeasons;
     }
 
-    public void setTotalTemporadas(Integer totalTemporadas) {
-        this.totalTemporadas = totalTemporadas;
+    public void setTotalSeasons(Integer totalSeasons) {
+        this.totalSeasons = totalSeasons;
     }
 
-    public Double getAvaliacao() {
-        return avaliacao;
+    public Double getRating() {
+        return rating;
     }
 
-    public void setAvaliacao(Double avaliacao) {
-        this.avaliacao = avaliacao;
+    public void setRating(Double rating) {
+        this.rating = rating;
     }
 
-    public Category getGenero() {
-        return genero;
+    public Category getGenre() {
+        return genre;
     }
 
-    public void setGenero(Category genero) {
-        this.genero = genero;
+    public void setGenre(Category genre) {
+        this.genre = genre;
     }
 
-    public String getAtores() {
-        return atores;
+    public String getActors() {
+        return actors;
     }
 
-    public void setAtores(String atores) {
-        this.atores = atores;
+    public void setActors(String actors) {
+        this.actors = actors;
     }
 
-    public String getPoster() {
-        return poster;
+    public String getPosterURL() {
+        return posterURL;
     }
 
-    public void setPoster(String poster) {
-        this.poster = poster;
+    public void setPosterURL(String posterURL) {
+        this.posterURL = posterURL;
     }
 
-    public String getSinopse() {
-        return sinopse;
+    public String getPlot() {
+        return plot;
     }
 
-    public void setSinopse(String sinopse) {
-        this.sinopse = sinopse;
+    public void setPlot(String plot) {
+        this.plot = plot;
     }
-
-
-
 }
