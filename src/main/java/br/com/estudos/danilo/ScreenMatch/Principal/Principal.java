@@ -33,6 +33,8 @@ public class Principal {
         this.serieRepository = serieRepository;
     }
 
+    private List <Serie> series = new ArrayList<>();
+
     public void showMenu() {
        var resp = -1;
 
@@ -76,19 +78,46 @@ public class Principal {
     }
 
     private void searchEpisodeBySerie(){
-        DadosSerie serieData = getSerieData();
-        List<SeasonData> seasons = new ArrayList<>();
+        listSearchSeries();
 
-        for (int i = 1; i <= serieData.totalTemporadas(); i++) {
-            var json = principalConsume.obterDados(URL + serieData.titulo().replace(" ", "+") + "&season=" + i + APIKey);
-            SeasonData seasonData = conv.getData(json, SeasonData.class);
-            seasons.add(seasonData);
+        System.out.println("Digite o nome da série: ");
+        var serieName = s.nextLine();
+
+        Optional<Serie> serie = series.stream()
+                .filter(s -> s.getTitle().toLowerCase().contains(serieName.toLowerCase()))
+                .findFirst();
+
+        if (serie.isPresent()){
+
+            var foundSerie = serie.get();
+            List<SeasonData> seasons = new ArrayList<>();
+
+            for (int i = 1; i <= foundSerie.getTotalSeasons(); i++) {
+                var json = principalConsume.obterDados(URL + foundSerie.getTitle().replace(" ", "+") + "&season=" + i + APIKey);
+                SeasonData seasonData = conv.getData(json, SeasonData.class);
+                seasons.add(seasonData);
+            }
+
+            seasons.forEach(System.out::println);
+
+            List<Episode> episodes = seasons.stream()
+                    .flatMap(s -> s.episodes().stream()
+                            .map(e -> new Episode(s.respectiveSeason(), e)))
+                    .collect(Collectors.toList());
+
+            foundSerie.setEpisodes(episodes);
+
+            serieRepository.save(foundSerie);
+
+        } else {
+            System.out.println("Série não encontrada");
         }
-        seasons.forEach(System.out::println);
+
+
     }
 
     private void listSearchSeries(){
-        List <Serie> series = series = serieRepository.findAll();
+        series = serieRepository.findAll();
         series.stream()
                 .sorted(Comparator.comparing(Serie::getGenre))
                 .forEach(System.out::println);

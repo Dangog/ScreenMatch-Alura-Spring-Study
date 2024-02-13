@@ -35,7 +35,7 @@ public class Serie {
     @Column(name = "plot")
     private String plot;
 
-    @Transient
+    @OneToMany(mappedBy = "serie")
     private List<Episode> episodes = new ArrayList<>();
 
     public Serie(){};
@@ -124,5 +124,13 @@ public class Serie {
 
     public void setPlot(String plot) {
         this.plot = plot;
+    }
+
+    public List<Episode> getEpisodes() {
+        return episodes;
+    }
+
+    public void setEpisodes(List<Episode> episodes) {
+        this.episodes = episodes;
     }
 }

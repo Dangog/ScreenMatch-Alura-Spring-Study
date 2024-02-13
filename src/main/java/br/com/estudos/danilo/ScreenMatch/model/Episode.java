@@ -1,15 +1,28 @@
 package br.com.estudos.danilo.ScreenMatch.model;
 
+import jakarta.persistence.*;
+
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 
+@Entity
+@Table(name = "episodes")
 public class Episode {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    private Long id;
 
     private Integer season;
     private String title;
     private Integer episodeNumber;
     private Double avaliation;
     private LocalDate releasedDate;
+
+    @ManyToOne
+    private Serie serie;
+
+    public Episode (){}
 
     public Episode(Integer seasonNumber, EpisodeData episodeData) {
         this.season = seasonNumber;
@@ -67,6 +80,22 @@ public class Episode {
 
     public void setReleasedDate(LocalDate releasedDate) {
         this.releasedDate = releasedDate;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Serie getSerie() {
+        return serie;
+    }
+
+    public void setSerie(Serie serie) {
+        this.serie = serie;
     }
 
     @Override
