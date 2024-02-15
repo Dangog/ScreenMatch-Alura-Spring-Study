@@ -35,7 +35,7 @@ public class Serie {
     @Column(name = "plot")
     private String plot;
 
-    @OneToMany(mappedBy = "serie")
+    @OneToMany(mappedBy = "serie", cascade = CascadeType.ALL)
     private List<Episode> episodes = new ArrayList<>();
 
     public Serie(){};
