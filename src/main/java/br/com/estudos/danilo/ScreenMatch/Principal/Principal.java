@@ -45,6 +45,7 @@ public class Principal {
                     2 - Buscar episódios
                     3 - Listar séries buscadas
                     4 - Buscar série por título
+                    5 - Buscar série por ator envolvido
                                     
                     0 - Sair                                 
                     """;
@@ -57,6 +58,7 @@ public class Principal {
                 case 2 -> searchEpisodeBySerie();
                 case 3 -> listSearchSeries();
                 case 4 -> searchSerieByTitle();
+                case 5 -> searchSerieByActor();
                 case 0 -> System.out.println("Saindo...");
                 default -> System.out.println("Opção inválida");
             }
@@ -129,6 +131,22 @@ public class Principal {
         System.out.println("Digite um título para a série: ");
         var serieName = s.nextLine();
         Optional<Serie> searchedSerie = serieRepository.findByTitleContainingIgnoreCase(serieName);
+
+        if (searchedSerie.isPresent()){
+            System.out.println("Dados da série: " + searchedSerie.get());
+        } else {
+            System.out.println("Série não encontrada");
+        }
+    }
+
+    private void searchSerieByActor() {
+        System.out.println("Digite o nome do ator envolvido para a busca: ");
+        var actorName = s.nextLine();
+
+        System.out.println("Digite a nota mínima a ser buscada: ");
+        var minimalRating = t.nextDouble();
+
+        Optional<Serie> searchedSerie = serieRepository.findByActorsContainingIgnoreCaseAndRatingGreaterThanEqual(actorName, minimalRating);
 
         if (searchedSerie.isPresent()){
             System.out.println("Dados da série: " + searchedSerie.get());

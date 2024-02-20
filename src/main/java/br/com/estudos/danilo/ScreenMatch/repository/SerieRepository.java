@@ -7,4 +7,5 @@ import java.util.Optional;
 
 public interface SerieRepository extends JpaRepository <Serie, Long> {
     Optional<Serie>findByTitleContainingIgnoreCase(String serieName);
+    Optional<Serie>findByActorsContainingIgnoreCaseAndRatingGreaterThanEqual(String actorName, double rating);
 }
