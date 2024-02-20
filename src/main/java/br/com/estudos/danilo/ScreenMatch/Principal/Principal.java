@@ -44,6 +44,7 @@ public class Principal {
                     1 - Buscar séries
                     2 - Buscar episódios
                     3 - Listar séries buscadas
+                    4 - Buscar série por título
                                     
                     0 - Sair                                 
                     """;
@@ -55,6 +56,7 @@ public class Principal {
                 case 1 -> searchSerieByWeb();
                 case 2 -> searchEpisodeBySerie();
                 case 3 -> listSearchSeries();
+                case 4 -> searchSerieByTitle();
                 case 0 -> System.out.println("Saindo...");
                 default -> System.out.println("Opção inválida");
             }
@@ -122,9 +124,20 @@ public class Principal {
                 .sorted(Comparator.comparing(Serie::getGenre))
                 .forEach(System.out::println);
     }
+
+    private void searchSerieByTitle() {
+        System.out.println("Digite um título para a série: ");
+        var serieName = s.nextLine();
+        Optional<Serie> searchedSerie = serieRepository.findByTitleContainingIgnoreCase(serieName);
+
+        if (searchedSerie.isPresent()){
+            System.out.println("Dados da série: " + searchedSerie.get());
+        } else {
+            System.out.println("Série não encontrada");
+        }
+    }
+
 }
-
-
 //        var json = principalConsume.obterDados(URL + resp.replace(" ", "+") + APIKey);
 //
 //        DadosSerie convertedData = conv.getData(json, br.com.estudos.danilo.ScreenMatch.model.DadosSerie.class);
