@@ -1,10 +1,6 @@
 package br.com.estudos.danilo.ScreenMatch.Principal;
 
-import br.com.estudos.danilo.ScreenMatch.model.DadosSerie;
-import br.com.estudos.danilo.ScreenMatch.model.Serie;
-import br.com.estudos.danilo.ScreenMatch.model.Episode;
-import br.com.estudos.danilo.ScreenMatch.model.EpisodeData;
-import br.com.estudos.danilo.ScreenMatch.model.SeasonData;
+import br.com.estudos.danilo.ScreenMatch.model.*;
 import br.com.estudos.danilo.ScreenMatch.repository.SerieRepository;
 import br.com.estudos.danilo.ScreenMatch.service.ConsumoAPI;
 import br.com.estudos.danilo.ScreenMatch.service.JacksonDataConverter;
@@ -46,7 +42,10 @@ public class Principal {
                     3 - Listar séries buscadas
                     4 - Buscar série por título
                     5 - Buscar série por ator envolvido
-                                    
+                    6 - Top 3 Series
+                    7 - Buscar séries por categoria / gênero
+                    8 - Top 3 Séries por Temporada e Avaliação
+                                   
                     0 - Sair                                 
                     """;
             System.out.println(menu);
@@ -59,12 +58,14 @@ public class Principal {
                 case 3 -> listSearchSeries();
                 case 4 -> searchSerieByTitle();
                 case 5 -> searchSerieByActor();
+                case 6 -> orderTopFiveSeries();
+                case 7 -> searchSerieByGenre();
+                case 8 -> orderTopThreeSeriesPerSeasonsAndRating();
                 case 0 -> System.out.println("Saindo...");
                 default -> System.out.println("Opção inválida");
             }
         }
     }
-
     private void searchSerieByWeb() {
         DadosSerie data = getSerieData();
         //seriesData.add(data);
@@ -153,6 +154,36 @@ public class Principal {
         } else {
             System.out.println("Série não encontrada");
         }
+    }
+
+    private void orderTopFiveSeries() {
+        List<Serie> listedSeries = serieRepository.findTop3ByOrderByRatingDesc();
+
+        listedSeries.forEach(s -> System.out.println(s.getTitle() + " avaliação: " + s.getRating()));
+    }
+
+    private void searchSerieByGenre() {
+        System.out.println("Digite a categoria/gênero da série a ser buscada: ");
+        var genreForSearch = s.nextLine();
+
+        Category genre = Category.fromString(genreForSearch);
+        List<Serie> searchSeries = serieRepository.findByGenre(genre);
+
+        System.out.println("Séries da categoria: " + genreForSearch);
+        searchSeries.forEach(System.out::println);
+
+    }
+
+    private void orderTopThreeSeriesPerSeasonsAndRating() {
+        System.out.println("Digite a quantidade máxima de temporadas que a série deve ter");
+        var totalSeasons = t.nextInt();
+
+        System.out.println("Digite a nota mínima a ser buscada: ");
+        var minimalRating = t.nextDouble();
+
+        List<Serie> listedSeries = serieRepository.findTop3ByTotalSeasonsLessThanEqualAndRatingGreaterThanEqual(totalSeasons, minimalRating);
+
+        listedSeries.forEach(s -> System.out.println(s.getTitle() + " quantidade de temporadas: " + s.getTotalSeasons() + " avaliação: " + s.getRating()));
     }
 
 }
