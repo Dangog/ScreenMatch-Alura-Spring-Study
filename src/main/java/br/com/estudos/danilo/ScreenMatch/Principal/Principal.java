@@ -45,6 +45,7 @@ public class Principal {
                     6 - Top 3 Series
                     7 - Buscar séries por categoria / gênero
                     8 - Top 3 Séries por Temporada e Avaliação
+                    9 - Buscar episódios por trecho
                                    
                     0 - Sair                                 
                     """;
@@ -61,6 +62,7 @@ public class Principal {
                 case 6 -> orderTopFiveSeries();
                 case 7 -> searchSerieByGenre();
                 case 8 -> orderTopThreeSeriesPerSeasonsAndRating();
+                case 9 -> searchEpisodesByPlot();
                 case 0 -> System.out.println("Saindo...");
                 default -> System.out.println("Opção inválida");
             }
@@ -175,16 +177,31 @@ public class Principal {
     }
 
     private void orderTopThreeSeriesPerSeasonsAndRating() {
+
         System.out.println("Digite a quantidade máxima de temporadas que a série deve ter");
         var totalSeasons = t.nextInt();
 
         System.out.println("Digite a nota mínima a ser buscada: ");
         var minimalRating = t.nextDouble();
 
-        List<Serie> listedSeries = serieRepository.findTop3ByTotalSeasonsLessThanEqualAndRatingGreaterThanEqual(totalSeasons, minimalRating);
+        List<Serie> listedSeries = serieRepository.findTop3WithJPQL(totalSeasons, minimalRating);
 
         listedSeries.forEach(s -> System.out.println(s.getTitle() + " quantidade de temporadas: " + s.getTotalSeasons() + " avaliação: " + s.getRating()));
     }
+
+
+    private void searchEpisodesByPlot() {
+        System.out.println("Digite um trecho do episódio para a busca: ");
+        var plotSearch = s.nextLine();
+
+        List<Episode> episodes = serieRepository.findEpisodeByPlot(plotSearch);
+
+        episodes.forEach(e ->
+                System.out.printf("Série: %s Temporada %s - Episódio %s - %s\n",
+                        e.getSerie().getTitle(), e.getSeason(),
+                        e.getEpisodeNumber(), e.getTitle()));
+    }
+
 
 }
 //        var json = principalConsume.obterDados(URL + resp.replace(" ", "+") + APIKey);
