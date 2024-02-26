@@ -25,6 +25,8 @@ public class Principal {
 
     private List<DadosSerie> seriesData = new ArrayList<>();
 
+    private Optional<Serie> searchedSerie;
+
     public Principal(SerieRepository serieRepository) {
         this.serieRepository = serieRepository;
     }
@@ -46,6 +48,8 @@ public class Principal {
                     7 - Buscar séries por categoria / gênero
                     8 - Top 3 Séries por Temporada e Avaliação
                     9 - Buscar episódios por trecho
+                    10 - Top 3 episódios por série
+                    11 - Buscar episódios por data
                                    
                     0 - Sair                                 
                     """;
@@ -63,11 +67,14 @@ public class Principal {
                 case 7 -> searchSerieByGenre();
                 case 8 -> orderTopThreeSeriesPerSeasonsAndRating();
                 case 9 -> searchEpisodesByPlot();
+                case 10 -> top3EpisodesPerSerie();
+                case 11 -> findEpisodesByDate();
                 case 0 -> System.out.println("Saindo...");
                 default -> System.out.println("Opção inválida");
             }
         }
     }
+
     private void searchSerieByWeb() {
         DadosSerie data = getSerieData();
         //seriesData.add(data);
@@ -133,7 +140,7 @@ public class Principal {
     private void searchSerieByTitle() {
         System.out.println("Digite um título para a série: ");
         var serieName = s.nextLine();
-        Optional<Serie> searchedSerie = serieRepository.findByTitleContainingIgnoreCase(serieName);
+        searchedSerie = serieRepository.findByTitleContainingIgnoreCase(serieName);
 
         if (searchedSerie.isPresent()){
             System.out.println("Dados da série: " + searchedSerie.get());
@@ -202,6 +209,33 @@ public class Principal {
                         e.getEpisodeNumber(), e.getTitle()));
     }
 
+
+    private void top3EpisodesPerSerie() {
+        searchSerieByTitle();
+
+        if(searchedSerie.isPresent()){
+            Serie serie = searchedSerie.get();
+            List<Episode> top3Episodes = serieRepository.findTop3EpisodesPerSerie(serie);
+            top3Episodes.forEach(e -> System.out.printf("Série: %s Temporada %s - Episódio %s - %s\n",
+                    e.getSerie().getTitle(), e.getSeason(),
+                    e.getEpisodeNumber(), e.getTitle()));
+        }
+    }
+
+    private void findEpisodesByDate() {
+        searchSerieByTitle();
+
+        System.out.println("Digite o ano para a busca: ");
+        var minimumYearReleased = s.nextInt();
+
+        if(searchedSerie.isPresent()){
+            Serie serie = searchedSerie.get();
+            List<Episode> episodesPerData = serieRepository.findEpisodesByDate(serie, minimumYearReleased);
+            episodesPerData.forEach(e -> System.out.printf("Série: %s Temporada %s - Episódio %s - %s\n",
+                    e.getSerie().getTitle(), e.getSeason(),
+                    e.getEpisodeNumber(), e.getTitle()));
+        }
+    }
 
 }
 //        var json = principalConsume.obterDados(URL + resp.replace(" ", "+") + APIKey);

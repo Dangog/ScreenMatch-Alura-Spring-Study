@@ -21,4 +21,10 @@ public interface SerieRepository extends JpaRepository <Serie, Long> {
 
     @Query(value ="SELECT e FROM Serie s JOIN s.episodes e WHERE e.title ILIKE %:plotSearch")
     List<Episode> findEpisodeByPlot(String plotSearch);
+
+    @Query(value ="SELECT e FROM Serie s JOIN s.episodes e WHERE s = :serie ORDER BY e.avaliation LIMIT 3")
+    List<Episode> findTop3EpisodesPerSerie(Serie serie);
+
+    @Query(value ="SELECT e FROM Serie s JOIN s.episodes e WHERE s = :serie AND YEAR(e.releasedDate) <= :minimumYearReleased")
+    List<Episode> findEpisodesByDate(Serie serie, int minimumYearReleased);
 }
