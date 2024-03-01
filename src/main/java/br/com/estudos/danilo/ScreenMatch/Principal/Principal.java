@@ -171,6 +171,12 @@ public class Principal {
         listedSeries.forEach(s -> System.out.println(s.getTitle() + " avaliação: " + s.getRating()));
     }
 
+     private List<Serie> orderTopFiveSeriesREST() {
+        List<Serie> listedSeries = serieRepository.findTop3ByOrderByRatingDesc();
+        listedSeries.forEach(s -> System.out.println(s.getTitle() + " avaliação: " + s.getRating()));
+        return listedSeries;
+    }
+
     private void searchSerieByGenre() {
         System.out.println("Digite a categoria/gênero da série a ser buscada: ");
         var genreForSearch = s.nextLine();
