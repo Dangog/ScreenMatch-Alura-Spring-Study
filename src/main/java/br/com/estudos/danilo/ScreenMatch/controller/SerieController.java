@@ -1,27 +1,50 @@
 package br.com.estudos.danilo.ScreenMatch.controller;
 
+import br.com.estudos.danilo.ScreenMatch.dto.EpisodeDTO;
 import br.com.estudos.danilo.ScreenMatch.dto.SerieDTO;
-import br.com.estudos.danilo.ScreenMatch.model.Serie;
-import br.com.estudos.danilo.ScreenMatch.repository.SerieRepository;
-import org.aspectj.apache.bcel.Repository;
+import br.com.estudos.danilo.ScreenMatch.service.SerieService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
+@RequestMapping("/series")
 public class SerieController {
 
     @Autowired
-    private SerieRepository repository;
+    private SerieService service;
 
-    @GetMapping("/series")
+    @GetMapping
     public List<SerieDTO> getSeries(){
-        return repository.findAll()
-                .stream()
-                .map(s -> new SerieDTO(s.getId(), s.getTitle(),s.getTotalSeasons(),s.getRating(),s.getGenre(),s.getActors(),s.getPosterURL(),s.getPlot()))
-                .collect(Collectors.toList());
+        return service.searchSeries();
+    }
+
+    @GetMapping("/top5")
+    public List<SerieDTO> findTop3ByOrderByRatingDesc(){
+        return service.searchTop3Series();
+    }
+
+    @GetMapping("/lancamentos")
+    public List<SerieDTO> searchNewReleases(){
+        return service.searchNewReleases();
+    }
+
+    @GetMapping("/{id}")
+    public SerieDTO getById(@PathVariable Long id){
+        return service.searchSerieById(id);
+    }
+
+    @GetMapping("/{id}/temporadas/todas")
+    public List<EpisodeDTO> getAllSeasons(@PathVariable Long id){
+        return service.getAllSeasons(id);
+    }
+
+    @GetMapping("/{id}/temporadas/{tempId}")
+    public List<EpisodeDTO> getEpisodesPerSeason(@PathVariable Long id){
+        return service.getAllSeasons(id);
     }
 }
