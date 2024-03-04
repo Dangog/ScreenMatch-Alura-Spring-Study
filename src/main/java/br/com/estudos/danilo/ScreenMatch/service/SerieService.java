@@ -2,6 +2,8 @@ package br.com.estudos.danilo.ScreenMatch.service;
 
 import br.com.estudos.danilo.ScreenMatch.dto.EpisodeDTO;
 import br.com.estudos.danilo.ScreenMatch.dto.SerieDTO;
+import br.com.estudos.danilo.ScreenMatch.model.Category;
+import br.com.estudos.danilo.ScreenMatch.model.Episode;
 import br.com.estudos.danilo.ScreenMatch.model.Serie;
 import br.com.estudos.danilo.ScreenMatch.repository.SerieRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,7 +12,6 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
 public class SerieService {
@@ -57,5 +58,24 @@ public class SerieService {
                     .collect(Collectors.toList());
         }     return null;
 
+    }
+
+    public List<EpisodeDTO> getSeasonsByTemp(Long id, Long tempID) {
+        List<EpisodeDTO> episodios = repository.getSeasonsByTemp(id, tempID).stream()
+                .map(e -> new EpisodeDTO(e.getSeason(),e.getTitle(),e.getEpisodeNumber()))
+                .collect(Collectors.toList());
+        return episodios;
+    }
+
+    public List<SerieDTO> getSerieByCategory(String categoria) {
+        Category category = Category.fromString(categoria);
+        return dtoSerieConverter(repository.findByGenre(category));
+    }
+
+    public List<EpisodeDTO> getTop5EpisodesPerSeason(Long id) {
+        return repository.findTop5EpisodesPerSerieID(id)
+                .stream()
+                .map(e -> new EpisodeDTO(e.getSeason(),e.getTitle(),e.getEpisodeNumber()))
+                .collect(Collectors.toList());
     }
 }
